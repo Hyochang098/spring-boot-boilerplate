@@ -35,6 +35,6 @@ springdoc-openapi가 스펙을 `/v3/api-docs`로, Swagger UI를 `/swagger-ui.htm
 
 ## 인증
 
-인증을 붙이면 `SwaggerConfig`의 `openAPI()` 빈에 security scheme을 추가한다.
-JWT bearer면 `SecurityScheme.Type.HTTP` + `scheme("bearer")` + `bearerFormat("JWT")`를
-`Components`에 등록하고 `addSecurityItem`으로 전역에 건다.
+`bearerAuth`(HTTP bearer, JWT) security scheme이 전역으로 걸려 있다.
+Swagger UI의 Authorize에 access token을 넣으면 그 토큰으로 인증된 요청이 나간다.
+토큰은 `POST /api/v1/auth/login`으로 받는다 (`security.md`).

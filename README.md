@@ -1,7 +1,7 @@
 # Spring Boot Backend Boilerplate
 
 Spring Boot 4 백엔드 프로젝트의 시작점.
-공통 응답·예외 처리·API 문서 설정과 CI/CD, 컨벤션 문서를 담고 있다. 도메인 코드는 없다.
+공통 응답·예외 처리·API 문서 설정, 이메일 로그인, CI/CD, 컨벤션 문서를 담고 있다.
 
 ## 기술 스택
 
@@ -10,8 +10,9 @@ Spring Boot 4 백엔드 프로젝트의 시작점.
 | 언어 | Java 21 |
 | 프레임워크 | Spring Boot 4.0.7 (Spring Framework 7) |
 | 빌드 | Gradle 9.5.1 (wrapper) |
-| 데이터베이스 | MySQL + Flyway |
+| 데이터베이스 | MySQL |
 | API 문서 | springdoc-openapi 3.0.3 (Swagger UI) |
+| 인증 | Spring Security 7 + JWT (oauth2 resource server) |
 | 코드 포맷 | Spotless + google-java-format 1.22.0 |
 | 배포 | GitHub Actions → GHCR → EC2 (arm64) + nginx + certbot |
 
@@ -22,17 +23,35 @@ Spring Boot 4 백엔드 프로젝트의 시작점.
 | 공통 응답 | `ApiResult` / `ErrorResult` / `SuccessCode` / `ErrorCode` |
 | 예외 처리 | `ApiException` + `GlobalExceptionHandler` (12개 핸들러) |
 | API 문서 | `SwaggerConfig` + `@ApiErrorCodeExample(s)` — 에러 코드 상수에서 응답 예시 생성 |
-| JPA | `BaseTimeEntity` + `JpaAuditingConfig`, Flyway (`ddl-auto: none`) |
+| 인증 | 이메일·비밀번호 로그인, JWT access/refresh 발급, refresh token 회전, 로그아웃 |
+| 인가 | `Role`(USER/ADMIN) + `@EnableMethodSecurity`, 401/403 JSON 응답 핸들러 |
+| JPA | `BaseTimeEntity` + `JpaAuditingConfig`, `users`·`refresh_tokens` 엔티티 |
 | 헬스체크 | `GET /health` |
 | 툴링 | Spotless, `lombok.config`(위험한 lombok 애노테이션 컴파일 차단), pre-commit hook |
-| 테스트 | Testcontainers(MySQL 8.4) 기반 컨텍스트 로드 테스트 |
+| 테스트 | Testcontainers(MySQL 8.4) 기반 컨텍스트 로드 + 인증 흐름 통합 테스트 |
 | CI/CD | CI(포맷+빌드+테스트), CD(GHCR 이미지 → EC2 배포 → 헬스체크), Release(PR 제목 기반 태깅) |
-| 컨벤션 | `CLAUDE.md` + `docs/` 7개 문서 (`AGENTS.md`는 `CLAUDE.md`를 가리키는 포인터) |
+| 컨벤션 | `CLAUDE.md` + `docs/` 8개 문서 (`AGENTS.md`는 `CLAUDE.md`를 가리키는 포인터) |
+
+## API
+
+| 메서드 | 경로 | 인증 |
+|---|---|---|
+| POST | `/api/v1/auth/signup` | 불필요 |
+| POST | `/api/v1/auth/login` | 불필요 |
+| POST | `/api/v1/auth/reissue` | 불필요 |
+| POST | `/api/v1/auth/logout` | access token |
+| GET | `/api/v1/users/me` | access token |
+| GET | `/health` | 불필요 |
+
+자세한 규약은 `docs/security.md`.
 
 ## 들어 있지 않은 것
 
-Spring Security / 인증, 외부 API 클라이언트, 파일 업로드, APM 에이전트.
-필요하면 각 프로젝트에서 추가한다.
+마이그레이션 도구, 소셜 로그인, 비밀번호 재설정, 이메일 발송, 외부 API 클라이언트,
+파일 업로드, APM 에이전트. 필요하면 각 프로젝트에서 추가한다.
+
+스키마는 Hibernate `ddl-auto`가 만든다. 로컬은 `update`, 테스트는 `create-drop`이다.
+운영에 올리기 전에 마이그레이션 도구를 붙이고 `validate`로 바꾼다 (`docs/entity.md`).
 
 ## 새 프로젝트로 시작하기
 
@@ -84,6 +103,14 @@ GNU sed(Linux)에서 달라서다. `perl -pi -e`는 양쪽에서 같게 동작�
 ```bash
 cp .env.example .env
 ```
+
+`.env`에 채울 값:
+
+| 이름 | 설명 |
+|---|---|
+| `DB_URL` `DB_USERNAME` `DB_PASSWORD` | MySQL 접속 정보 |
+| `JWT_SECRET` | HS256 서명 키. **32자 이상**이어야 기동한다 |
+| `CORS_ALLOWED_ORIGINS` | 허용할 오리진. 쉼표로 여러 개 |
 
 ### 실행
 

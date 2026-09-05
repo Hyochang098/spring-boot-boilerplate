@@ -19,6 +19,8 @@ import io.swagger.v3.oas.models.media.MediaType;
 import io.swagger.v3.oas.models.media.Schema;
 import io.swagger.v3.oas.models.responses.ApiResponse;
 import io.swagger.v3.oas.models.responses.ApiResponses;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -56,7 +58,17 @@ public class SwaggerConfig {
 
   @Bean
   public OpenAPI openAPI() {
-    return new OpenAPI().info(new Info().title("API").description("백엔드 API 문서").version("v1"));
+    return new OpenAPI()
+        .info(new Info().title("API").description("백엔드 API 문서").version("v1"))
+        .components(
+            new Components()
+                .addSecuritySchemes(
+                    "bearerAuth",
+                    new SecurityScheme()
+                        .type(SecurityScheme.Type.HTTP)
+                        .scheme("bearer")
+                        .bearerFormat("JWT")))
+        .addSecurityItem(new SecurityRequirement().addList("bearerAuth"));
   }
 
   @Bean

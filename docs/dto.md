@@ -11,11 +11,9 @@
 
 ## record의 `toString()`
 
-`lombok.config`가 막는 것은 `@ToString`이고, record가 자동으로 만드는 `toString()`은 막지 못한다.
-`entity.md`의 lombok 표가 record까지 적용된다고 읽지 않는다.
-
 - 로그에 남으면 안 되는 값을 필드로 가진 요청 record는
-  **`toString()`을 직접 오버라이드해서 그 필드를 마스킹한다**
+  **`toString()`을 직접 오버라이드해서 그 필드를 마스킹한다.**
+  `lombok.config`가 막는 것은 `@ToString`이고 record가 만드는 `toString()`은 막지 못한다
 - 요청 record를 통째로 로그에 넘기지 않는다 (`logging.md`)
 
 ## 검증은 2층

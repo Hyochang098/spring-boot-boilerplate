@@ -7,8 +7,16 @@ spring:
     password: ${DB_PASSWORD}
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     open-in-view: false
 
 server:
   forward-headers-strategy: framework
+
+jwt:
+  secret: ${JWT_SECRET}
+  access-token-expiry: 30m
+  refresh-token-expiry: 14d
+
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS}

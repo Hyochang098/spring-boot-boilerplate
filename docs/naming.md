@@ -53,9 +53,8 @@
   예: `User` + `@Table(name = "users")`, `ArticleComment` + `@Table(name = "article_comments")`
 - 컬럼명은 PK는 `id` / FK는 `<참조테이블>_id` / 시각은 `*_at` / boolean은 `is_*`로 쓴다
 
-실제 DDL은 `src/main/resources/db/migration`에 있다.
-새 테이블·컬럼을 추가할 때 위 규칙을 지키고, 기존 이름을 확인할 때는 마이그레이션 SQL을 본다
-(`docs/entity.md`).
+DDL은 따로 두지 않고 Hibernate가 엔티티에서 만든다 (`docs/entity.md`).
+기존 테이블·컬럼 이름을 확인할 때는 엔티티의 `@Table` / `@Column`을 본다.
 
 ## 테스트
 
